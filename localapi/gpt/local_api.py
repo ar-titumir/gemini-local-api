@@ -100,7 +100,7 @@ class LOCAL_API():
             time.sleep(0.1)  # Wait before trying again
         return f"Error occurred while clicking button: {err}"
     
-    def get_last_response(self):  
+    def get_last_new_response(self):  
         err, div_text, new_response_id = None, None, False
         try:
             button = self.get_send_button()
@@ -111,19 +111,26 @@ class LOCAL_API():
             pass
 
         try: 
-            response_containers = self.driver.find_elements(
+            response_containers = self.driver.find_elements(    # each container is a prompt + response group
                 By.XPATH, 
-                "//div[starts-with(@class, 'conversation-container')]"
+                "//div[starts-with(@class, 'conversation-container')]" # old = 'conversation-container' conversation-container
             )
-            new_response_id = response_containers[-1].get_attribute("id")
-            if new_response_id == self.history['last_response_id'] and self.history['last_response_id']:
-                return {'response': None, 'error': 'no new response', 'id': None}
-            
-            div_elements = response_containers[-1].find_elements(
-                By.XPATH,
-                ".//message-content[starts-with(@class,'model-response-text')]"
-            )
-            div_text = div_elements[-1].text
+            print(f"Found {len(response_containers)} response containers")  # debug line
+            if response_containers:
+                new_response_id = response_containers[-1].get_attribute("id")
+                if new_response_id == self.history['last_response_id'] and self.history['last_response_id']:
+                    return {'response': None, 'error': 'no new response', 'id': None}
+                
+                div_elements = response_containers[-1].find_elements( # each element is a response of a prompt
+                    By.XPATH,
+                    ".//message-content[starts-with(@id,'message-content')]"  # old:   @class,'model-response-text'
+                )
+                if div_elements:
+                    div_text = div_elements[-1].text
+                else:
+                    err = "No response text found"
+            else:
+                err = "No response containers found"
         except Exception as e:
             err = e
         response = {'response': div_text, 'error': err, 'id':  new_response_id if new_response_id else None}
@@ -134,7 +141,7 @@ class LOCAL_API():
     
     def copy_last_response_to_clipboard(self):
         pass
-        # steps: same as get_last_response, then find the copy button and click it
+        # steps: same as get_last_new_response, then find the copy button and click it
         # try:
         #     <button _ngcontent-ng-c4159091283 mat-button tabindex="0" mattooltip="Copy response" aria-label="Copy" data-test-id="copy-button" class="mdc-button mat-mdc-button-base mat-mdc-tooltip-trigger icon-button mat-mdc-button mat-unthemed" mat-ripple-loader-class-name="mat-mdc-button-ripple" jslog="178035;track:generic_click,impression;BardVeMetadataKey:[["r_7711edcb96c84e21","c_a39913e6d4337352",null,"rc_c5681538456025e4",null,null,"en",null,1,null,null,1,0]];mutable:true" aria-describedby="cdk-describedby-message-ng-1-11" cdk-describedby-host="ng-1">flex
         # except Exception as e:
@@ -153,7 +160,7 @@ class LOCAL_API():
         result['response']['error'] = "timeout after sending prompt"
         start_time = time.time()
         while (time.time() - start_time) < timeout:
-            response = self.get_last_response()
+            response = self.get_last_new_response()
             if response['error'] == 'still generating':
                 time.sleep(0.2)
                 continue
@@ -182,7 +189,7 @@ if __name__ == "__main__":
     # # response = api.send_prompt("Hello, how are you?")
     # # print(response)
     # # time.sleep(2)
-    # # response = api.get_last_response()
+    # # response = api.get_last_new_response()
     # # print(response)
     # hard_math_prompts = [
     #     "What is 123456789 * 987654321?",
