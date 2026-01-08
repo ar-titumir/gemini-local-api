@@ -23,7 +23,7 @@ Make sure you have Python installed.
 
 ### 1️⃣ Clone this repository
 ```sh
-git clone https://github.com/azizur19/gemini-local-api.git
+git clone https://github.com/ar-titumir/gemini-local-api.git
 cd gemini-local-api
 ```
 
@@ -89,9 +89,9 @@ print(res.json()["result"]["response"]["response"])
 
 ## 📌 Author
 
-Created by [**ar_titumir**](https://github.com/azizur19)  
+Created by [**ar_titumir**](https://github.com/ar-titumir)  
 If this tool helps your productivity, please give a ⭐ on GitHub. 
-https://github.com/azizur19 
+https://github.com/ar-titumir 
 
 ---
 
