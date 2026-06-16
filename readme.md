@@ -90,7 +90,7 @@ print(res.json()["result"]["response"]["response"])
 ## 📌 Author
 
 Created by [**ar_titumir**](https://github.com/ar-titumir)  
-If this tool helps your productivity, please give a ⭐ on GitHub. 
+If this tool helps your productivity, please give a ⭐ at [this repo](https://github.com/ar-titumir/gemini-local-api). 
 https://github.com/ar-titumir 
 
 ---
